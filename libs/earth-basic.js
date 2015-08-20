@@ -14,6 +14,10 @@ EarthApp.prototype.init = function (param) {
 
     this.addObject(earth);
 
+    var sun = new Sun();
+    sun.init();
+    this.addObject(sun);
+
 }
 
 // 地球物体
@@ -28,7 +32,7 @@ Earth.prototype.init = function () {
     // 创建纹理，材质，几何体，生成网格，设置Object3D
     var earthMap = "images/earth_surface_2048.jpg";
     var texture = new THREE.ImageUtils.loadTexture(earthMap);
-    var material = new THREE.MeshBasicMaterial({map: texture});
+    var material = new THREE.MeshPhongMaterial({map: texture});
     var geometry = new THREE.SphereGeometry(1, 32, 32);
     var mesh = new THREE.Mesh(geometry, material);
 
@@ -46,4 +50,16 @@ Earth.ROTATION_Y = 0.0025;
 // z轴初始倾斜
 Earth.TILT = 0.41;
 
+// 创建太阳
+Sun = function () {
+    Sim.Object.call(this);
+}
+
+Sun.prototype = new Sim.Object();
+
+Sun.prototype.init = function () {
+    var light = new THREE.PointLight(0xffffff, 2, 100);
+    light.position.set(-10, 0, 20);
+    this.setObject3D(light);
+}
 
