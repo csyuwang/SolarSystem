@@ -18,6 +18,9 @@ EarthApp.prototype.init = function (param) {
     sun.init();
     this.addObject(sun);
 
+    // Move the camera back so we can see our Moon
+    this.camera.position.z += 1.667;
+
 }
 
 // 地球物体
@@ -35,6 +38,8 @@ Earth.prototype.init = function () {
 
     this.createGlobe();
     this.createClouds();
+
+    this.createMoon();
 }
 Earth.prototype.createGlobe = function () {
     // 创建多重纹理，包括法线贴图和高光贴图
@@ -60,11 +65,11 @@ Earth.prototype.createGlobe = function () {
         lights: true
     });
 
-    var globeGeometry = new THREE.SphereGeometry(1, 128, 128);
+    var globeGeometry = new THREE.SphereGeometry(1, 32, 32);
     // 为着色器计算切线
     globeGeometry.computeTangents();
     var globeMesh = new THREE.Mesh(globeGeometry, shaderMaterial);
-    globeMesh.rotation.z = Earth.TILT;
+    globeMesh.rotation.x = Earth.TILT;
     // 添加到群组
     this.object3D.add(globeMesh);
     // 设置globeMesh
@@ -77,15 +82,20 @@ Earth.prototype.createClouds = function () {
     var cloudsMap = new THREE.ImageUtils.loadTexture("images/earth_clouds_1024.png");
     // 透明材质
     var cloudsMaterial = new THREE.MeshLambertMaterial({color: 0xffffff, map: cloudsMap, transparent: true});
-    var cloudsGeometry = new THREE.SphereGeometry(Earth.CLOUDS_SCALE, 128, 128);
+    var cloudsGeometry = new THREE.SphereGeometry(Earth.CLOUDS_SCALE, 32, 32);
     var cloudsMesh = new THREE.Mesh(cloudsGeometry, cloudsMaterial);
-    cloudsMesh.rotation.z = Earth.TILT;
+    cloudsMesh.rotation.x = Earth.TILT;
     // 添加到群组
     this.object3D.add(cloudsMesh);
     // 设置globeMesh
     this.cloudsMesh = cloudsMesh;
 }
 
+Earth.prototype.createMoon = function () {
+    var moon = new Moon();
+    moon.init();
+    this.addChild(moon);
+}
 
 Earth.prototype.update = function () {
 
@@ -99,13 +109,14 @@ Earth.prototype.update = function () {
 }
 
 // 地球每次的旋转弧度
-Earth.ROTATION_Y = 0.001;
-// z轴初始倾斜
+Earth.ROTATION_Y = 0.003;
 Earth.TILT = 0.41;
+// 地球半径
+Earth.RADIUS = 6371;
 // 云层放大比例
 Earth.CLOUDS_SCALE = 1.005;
 // 云层每次的旋转弧度
-Earth.CLOUDS_ROTATION_Y = Earth.ROTATION_Y * 0.9;
+Earth.CLOUDS_ROTATION_Y = Earth.ROTATION_Y * 0.95;
 
 
 // 创建太阳
@@ -120,4 +131,46 @@ Sun.prototype.init = function () {
     light.position.set(-10, 0, 20);
     this.setObject3D(light);
 }
+
+// 创建月球
+Moon = function(){
+    Sim.Object.call(this);
+}
+
+Moon.prototype = new Sim.Object();
+
+Moon.prototype.init = function () {
+    var moonMap = new THREE.ImageUtils.loadTexture("images/moon_1024.jpg");
+    var material = new THREE.MeshPhongMaterial( { map: moonMap,ambient:0x888888 } );
+    var moonGeometry = new THREE.SphereGeometry(Moon.SIZE_IN_EARTHS, 32, 32);
+    var moonMesh = new THREE.Mesh( moonGeometry, material );
+
+    var distance = Moon.DISTANCE_FROM_EARTH / Earth.RADIUS;
+    moonMesh.position.set(Math.sqrt(distance / 2), 0, -Math.sqrt(distance / 2));
+
+    moonMesh.rotation.y = Math.PI;
+
+    var group = new THREE.Object3D();
+    group.add(moonMesh);
+
+    group.rotation.x = Moon.INCLINATION;
+
+    this.setObject3D(group);
+
+    this.moonMesh = moonMesh;
+}
+
+Moon.prototype.update = function()
+{
+    // Moon orbit
+    this.object3D.rotation.y += (Earth.ROTATION_Y / Moon.PERIOD);
+
+    Sim.Object.prototype.update.call(this);
+}
+
+Moon.DISTANCE_FROM_EARTH = 356400;
+Moon.PERIOD = 28;
+Moon.EXAGGERATE_FACTOR = 1.2;
+Moon.INCLINATION = 0.089;
+Moon.SIZE_IN_EARTHS = 1 / 3.7 * Moon.EXAGGERATE_FACTOR;
 
