@@ -164,7 +164,6 @@ Moon.prototype.update = function()
 {
     // Moon orbit
     this.object3D.rotation.y += (Earth.ROTATION_Y / Moon.PERIOD);
-
     Sim.Object.prototype.update.call(this);
 }
 

@@ -4,3 +4,9 @@
 2015-08-21
     创建多重纹理，包括法线贴图和高光贴图
     创建云层
+    创建月球
+2015-08-23
+    添加saturn.js,stars.js,orbit.js
+    创建土星和土星环 saturn.js
+    使用粒子系统绘制点 stars.js
+    使用线几何体创建轨道 orbit.js
