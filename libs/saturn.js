@@ -1,3 +1,4 @@
+// 土星星球类
 Saturn = function()
 {
     Sim.Object.call(this);
@@ -44,7 +45,7 @@ Saturn.prototype.createGlobe = function(){
 }
 
 Saturn.prototype.createRings = function(){
-    var texture = THREE.ImageUtils.loadTexture(images/SatRing.png);
+    var texture = THREE.ImageUtils.loadTexture("images/SatRing.png");
     var geometry = new Saturn.Rings(1.1, 1.867, 64);
 
     var material = new THREE.MeshLambertMaterial( {map: texture, transparent:true, ambient:0xffffff } );
@@ -70,6 +71,7 @@ Saturn.prototype.update = function(){
 Saturn.TILT = -0.466;
 Saturn.REVOLUTION_Y = 0.003;
 
+// 土星环 继承Geometry
 Saturn.Rings = function(innerRadius,outerRadius,nSegments){
     THREE.Geometry.call(this);
 
